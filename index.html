@@ -44,6 +44,9 @@
       padding: 9px 14px; border: 2px solid #dde3f0; border-radius: 8px;
       font-size: 0.88rem; background: #f7f9ff; cursor: pointer; outline: none;
     }
+    .nights-filter { display: flex; align-items: center; gap: 6px; background: #f7f9ff; border: 2px solid #dde3f0; border-radius: 8px; padding: 7px 12px; }
+    .nights-filter input[type=number] { width: 56px; padding: 6px 8px; border: 2px solid #dde3f0; border-radius: 6px; font-size: 0.88rem; font-weight: 600; color: #1a4fa0; outline: none; background: white; text-align: center; }
+    .nights-filter input[type=number]:focus { border-color: #2e86de; }
     .budget-filter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .budget-filter span { font-size: 0.88rem; color: #444; font-weight: 500; }
     .budget-filter input[type=number] {
@@ -241,12 +244,13 @@
       <option value="summer">☀️ Лето (июн–авг)</option>
       <option value="autumn">🍂 Осень (сен–ноя)</option>
     </select>
-    <select id="filter-nights" onchange="applyFilters()">
-      <option value="">📅 Любой срок</option>
-      <option value="7">7 ночей</option>
-      <option value="10">10 ночей</option>
-      <option value="14">14 ночей</option>
-    </select>
+    <div class="nights-filter">
+      <span>📅</span>
+      <input type="number" id="filter-nights-min" placeholder="от" min="1" max="30" oninput="applyFilters()">
+      <span>–</span>
+      <input type="number" id="filter-nights-max" placeholder="до" min="1" max="30" oninput="applyFilters()">
+      <span class="people-sub">ночей</span>
+    </div>
     <div class="people-filter">
       <span class="people-label">👨‍👩‍👧‍👦 Туристы:</span>
       <div class="people-counter">
@@ -542,7 +546,8 @@ function applyFilters() {
   const country = document.getElementById('filter-country').value;
   const season = document.getElementById('filter-season').value;
   const type = document.getElementById('filter-type').value;
-  const nights = document.getElementById('filter-nights').value;
+  const nightsMin = parseInt(document.getElementById('filter-nights-min').value) || 1;
+  const nightsMax = parseInt(document.getElementById('filter-nights-max').value) || 30;
   const budgetMin = parseInt(document.getElementById('budget-min').value) || 0;
   const budgetMax = parseInt(document.getElementById('budget-max').value) || 99999;
   const sort = document.querySelector('.sort-select').value;
@@ -555,7 +560,7 @@ function applyFilters() {
     if (country && t.country !== country) return false;
     if (season && !t.seasons.includes(season)) return false;
     if (type && !t.tags.includes(type)) return false;
-    if (nights && t.nights !== parseInt(nights)) return false;
+    if (t.nights < nightsMin || t.nights > nightsMax) return false;
     if (t.price < budgetMin || t.price > budgetMax) return false;
     return true;
   });
@@ -591,6 +596,8 @@ function resetFilters() {
   document.getElementById('cnt-adults').textContent = 2;
   document.getElementById('cnt-kids').textContent = 0;
   document.getElementById('people-total').textContent = '2 чел.';
+  document.getElementById('filter-nights-min').value = '';
+  document.getElementById('filter-nights-max').value = '';
   document.getElementById('filter-season').value = '';
   document.getElementById('budget-min').value = 0;
   document.getElementById('budget-max').value = 6000;
