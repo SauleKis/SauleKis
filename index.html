@@ -29,8 +29,16 @@
     .search-row button {
       padding: 13px 26px; background: #1a4fa0; color: white; border: none;
       border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer;
+      transition: background 0.2s;
     }
     .search-row button:hover { background: #163d80; }
+    .search-row button.searching { background: #2e86de; }
+
+    .search-highlight { background: #fff9c4; border-radius: 3px; padding: 0 2px; }
+    #search-status {
+      font-size: 0.82rem; color: #2e86de; margin-top: 8px; min-height: 18px;
+      font-weight: 500;
+    }
     .filters { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
     .filters select {
       padding: 9px 14px; border: 2px solid #dde3f0; border-radius: 8px;
@@ -183,8 +191,8 @@
 
 <div class="search-bar">
   <div class="search-row">
-    <input type="text" id="search-input" placeholder="Поиск по названию, курорту, стране..." oninput="applyFilters()">
-    <button onclick="applyFilters()">🔍 Найти</button>
+    <input type="text" id="search-input" placeholder="Поиск по названию, курорту, стране..." oninput="applyFilters()" onkeydown="if(event.key==='Enter') applyFilters()">
+    <button id="search-btn" onclick="doSearch()">🔍 Найти</button>
   </div>
   <div class="filters">
     <select id="filter-country" onchange="applyFilters()">
@@ -215,6 +223,7 @@
     </div>
     <button class="reset-btn" onclick="resetFilters()">✕ Сбросить</button>
   </div>
+  <div id="search-status"></div>
 </div>
 
 <div class="container">
@@ -442,8 +451,19 @@ function drawChart() {
 }
 
 // ── фильтры ──
+function doSearch() {
+  const btn = document.getElementById('search-btn');
+  btn.textContent = '⏳ Ищем...';
+  btn.classList.add('searching');
+  setTimeout(() => {
+    applyFilters();
+    btn.textContent = '🔍 Найти';
+    btn.classList.remove('searching');
+  }, 400);
+}
+
 function applyFilters() {
-  const q = document.getElementById('search-input').value.toLowerCase();
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
   const country = document.getElementById('filter-country').value;
   const type = document.getElementById('filter-type').value;
   const nights = document.getElementById('filter-nights').value;
@@ -451,17 +471,35 @@ function applyFilters() {
   const sort = document.querySelector('.sort-select').value;
 
   let result = tours.filter(t => {
-    if (q && !t.name.toLowerCase().includes(q) && !t.resort.toLowerCase().includes(q) && !t.country.toLowerCase().includes(q)) return false;
+    if (q && !t.name.toLowerCase().includes(q) &&
+            !t.resort.toLowerCase().includes(q) &&
+            !t.country.toLowerCase().includes(q) &&
+            !t.desc.toLowerCase().includes(q)) return false;
     if (country && t.country !== country) return false;
     if (type && !t.tags.includes(type)) return false;
     if (nights && t.nights !== parseInt(nights)) return false;
     if (t.price > budget) return false;
     return true;
   });
+
   if (sort === 'price-asc') result.sort((a,b) => a.price - b.price);
   else if (sort === 'price-desc') result.sort((a,b) => b.price - a.price);
   else result.sort((a,b) => b.rating - a.rating);
+
   renderAll(result);
+
+  const status = document.getElementById('search-status');
+  if (q || country || type || nights || budget < 6000) {
+    const filters = [];
+    if (q) filters.push(`"${q}"`);
+    if (country) filters.push(country);
+    if (type) filters.push(type);
+    if (nights) filters.push(nights + ' ночей');
+    if (budget < 6000) filters.push('до $' + budget.toLocaleString());
+    status.textContent = `🔎 Фильтр: ${filters.join(' · ')} — найдено ${result.length} тур(ов)`;
+  } else {
+    status.textContent = '';
+  }
 }
 
 function updateBudget() {
@@ -477,6 +515,7 @@ function resetFilters() {
   document.getElementById('filter-nights').value = '';
   document.getElementById('filter-budget').value = 6000;
   document.getElementById('budget-val').textContent = '$6 000';
+  document.getElementById('search-status').textContent = '';
   applyFilters();
 }
 
