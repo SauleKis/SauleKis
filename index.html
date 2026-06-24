@@ -84,6 +84,8 @@
     .tag.ai    { background: #fff3e0; color: #e65100; }
     .tag.excursion { background: #f3e5f5; color: #6a1b9a; }
     .tag.history   { background: #fce4ec; color: #880e4f; }
+    .tag.season    { background: #f5f5f5; color: #555; font-size: 0.68rem; }
+    .card-seasons  { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
     .card-body h3 { font-size: 0.97rem; margin-bottom: 4px; color: #1a4fa0; }
     .card-body .location { font-size: 0.8rem; color: #888; margin-bottom: 8px; }
     .card-body .desc { font-size: 0.82rem; color: #555; line-height: 1.5; margin-bottom: 12px; }
@@ -210,6 +212,13 @@
       <option value="excursion">Экскурсии</option>
       <option value="history">История</option>
     </select>
+    <select id="filter-season" onchange="applyFilters()">
+      <option value="">🗓️ Любой сезон</option>
+      <option value="winter">❄️ Зима (дек–фев)</option>
+      <option value="spring">🌸 Весна (мар–май)</option>
+      <option value="summer">☀️ Лето (июн–авг)</option>
+      <option value="autumn">🍂 Осень (сен–ноя)</option>
+    </select>
     <select id="filter-nights" onchange="applyFilters()">
       <option value="">📅 Любой срок</option>
       <option value="7">7 ночей</option>
@@ -270,17 +279,18 @@
 
 <script>
 const tagLabels = { beach:"Пляж", kids:"Дети", ai:"All Inclusive", excursion:"Экскурсии", history:"История" };
+const seasonLabels = { winter:"❄️ Зима", spring:"🌸 Весна", summer:"☀️ Лето", autumn:"🍂 Осень" };
 
 const tours = [
-  { id:1, name:"Selectum Family Side 5*",   country:"Турция",  resort:"Сиде",     price:3200, nights:7,  rating:4.9, tags:["beach","kids","ai"],             desc:"Новый отель с аквапарком, детским клубом и лунапарком.", emoji:"🏖️", bg:"#e0f2fe" },
-  { id:2, name:"Voyage Sorgun 5*",           country:"Турция",  resort:"Сиде",     price:3750, nights:7,  rating:4.8, tags:["beach","kids","ai"],             desc:"Сосновый лес у моря, 5+ бассейнов, анимация.", emoji:"🌲", bg:"#e8f5e9" },
-  { id:3, name:"Selectum Family Belek 5*",   country:"Турция",  resort:"Белек",    price:4100, nights:7,  rating:4.7, tags:["beach","kids","excursion","ai"], desc:"Рядом с The Land of Legends. Трансфер включён.", emoji:"🎡", bg:"#f3e5f5" },
-  { id:4, name:"Rixos Premium Belek 5*",     country:"Турция",  resort:"Белек",    price:5500, nights:7,  rating:5.0, tags:["beach","kids","ai"],             desc:"Флагман Rixos с частным пляжем и премиум-сервисом.", emoji:"👑", bg:"#fff3e0" },
-  { id:5, name:"Titanic Beach Lara 5*",      country:"Турция",  resort:"Анталья",  price:2800, nights:7,  rating:4.6, tags:["beach","kids","ai"],             desc:"Пляж Лара, отличная детская анимация.", emoji:"🌅", bg:"#fce4ec" },
-  { id:6, name:"Pickalbatros Aqua Park 5*",  country:"Египет",  resort:"Хургада",  price:2200, nights:7,  rating:4.5, tags:["beach","kids","ai"],             desc:"Огромный аквапарк у Красного моря.", emoji:"🐠", bg:"#e0f7fa" },
-  { id:7, name:"Centara Grand 5*",           country:"Таиланд", resort:"Краби",    price:3900, nights:10, rating:4.8, tags:["beach","kids","excursion"],      desc:"Скалы, джунгли, экскурсии на острова.", emoji:"🏝️", bg:"#e8f5e9" },
-  { id:8, name:"Atlantis The Palm 5*",       country:"ОАЭ",     resort:"Дубай",    price:5800, nights:7,  rating:4.9, tags:["beach","kids","excursion","ai"], desc:"Аквапарк Aquaventure на легендарном Palm.", emoji:"🌴", bg:"#fff8e1" },
-  { id:9, name:"Ikos Oceania 5*",            country:"Греция",  resort:"Халкидики",price:4400, nights:10, rating:4.9, tags:["beach","kids","history","ai"],   desc:"Роскошный курорт рядом с монастырями Афона.", emoji:"🏛️", bg:"#e8eaf6" },
+  { id:1, name:"Selectum Family Side 5*",   country:"Турция",  resort:"Сиде",     price:3200, nights:7,  rating:4.9, tags:["beach","kids","ai"],             seasons:["spring","summer","autumn"], desc:"Новый отель с аквапарком, детским клубом и лунапарком.", emoji:"🏖️", bg:"#e0f2fe" },
+  { id:2, name:"Voyage Sorgun 5*",           country:"Турция",  resort:"Сиде",     price:3750, nights:7,  rating:4.8, tags:["beach","kids","ai"],             seasons:["spring","summer","autumn"], desc:"Сосновый лес у моря, 5+ бассейнов, анимация.", emoji:"🌲", bg:"#e8f5e9" },
+  { id:3, name:"Selectum Family Belek 5*",   country:"Турция",  resort:"Белек",    price:4100, nights:7,  rating:4.7, tags:["beach","kids","excursion","ai"], seasons:["spring","summer","autumn"], desc:"Рядом с The Land of Legends. Трансфер включён.", emoji:"🎡", bg:"#f3e5f5" },
+  { id:4, name:"Rixos Premium Belek 5*",     country:"Турция",  resort:"Белек",    price:5500, nights:7,  rating:5.0, tags:["beach","kids","ai"],             seasons:["spring","summer","autumn"], desc:"Флагман Rixos с частным пляжем и премиум-сервисом.", emoji:"👑", bg:"#fff3e0" },
+  { id:5, name:"Titanic Beach Lara 5*",      country:"Турция",  resort:"Анталья",  price:2800, nights:7,  rating:4.6, tags:["beach","kids","ai"],             seasons:["spring","summer","autumn"], desc:"Пляж Лара, отличная детская анимация.", emoji:"🌅", bg:"#fce4ec" },
+  { id:6, name:"Pickalbatros Aqua Park 5*",  country:"Египет",  resort:"Хургада",  price:2200, nights:7,  rating:4.5, tags:["beach","kids","ai"],             seasons:["winter","spring","autumn"], desc:"Огромный аквапарк у Красного моря.", emoji:"🐠", bg:"#e0f7fa" },
+  { id:7, name:"Centara Grand 5*",           country:"Таиланд", resort:"Краби",    price:3900, nights:10, rating:4.8, tags:["beach","kids","excursion"],      seasons:["winter","spring","summer"], desc:"Скалы, джунгли, экскурсии на острова.", emoji:"🏝️", bg:"#e8f5e9" },
+  { id:8, name:"Atlantis The Palm 5*",       country:"ОАЭ",     resort:"Дубай",    price:5800, nights:7,  rating:4.9, tags:["beach","kids","excursion","ai"], seasons:["winter","spring","autumn"], desc:"Аквапарк Aquaventure на легендарном Palm.", emoji:"🌴", bg:"#fff8e1" },
+  { id:9, name:"Ikos Oceania 5*",            country:"Греция",  resort:"Халкидики",price:4400, nights:10, rating:4.9, tags:["beach","kids","history","ai"],   seasons:["spring","summer","autumn"], desc:"Роскошный курорт рядом с монастырями Афона.", emoji:"🏛️", bg:"#e8eaf6" },
 ];
 
 // живые цены на карточках
@@ -305,11 +315,13 @@ let chartCtx = null;
 // ── рендер карточки ──
 function renderCard(t) {
   const tags = t.tags.map(tg => `<span class="tag ${tg}">${tagLabels[tg]}</span>`).join('');
+  const seasons = t.seasons.map(s => `<span class="tag season">${seasonLabels[s]}</span>`).join('');
   return `
     <div class="tour-card" id="tour-${t.id}" data-price="${t.price}" data-rating="${t.rating}" data-nights="${t.nights}" data-country="${t.country}" data-tags="${t.tags.join(',')}">
       <div class="card-img" style="background:${t.bg}">${t.emoji}</div>
       <div class="card-body">
         <div class="card-tags">${tags}</div>
+        <div class="card-seasons">${seasons}</div>
         <h3>${t.name}</h3>
         <div class="location">📍 ${t.resort}, ${t.country} · ${t.nights} ночей</div>
         <p class="desc">${t.desc}</p>
@@ -465,6 +477,7 @@ function doSearch() {
 function applyFilters() {
   const q = document.getElementById('search-input').value.toLowerCase().trim();
   const country = document.getElementById('filter-country').value;
+  const season = document.getElementById('filter-season').value;
   const type = document.getElementById('filter-type').value;
   const nights = document.getElementById('filter-nights').value;
   const budget = parseInt(document.getElementById('filter-budget').value);
@@ -476,6 +489,7 @@ function applyFilters() {
             !t.country.toLowerCase().includes(q) &&
             !t.desc.toLowerCase().includes(q)) return false;
     if (country && t.country !== country) return false;
+    if (season && !t.seasons.includes(season)) return false;
     if (type && !t.tags.includes(type)) return false;
     if (nights && t.nights !== parseInt(nights)) return false;
     if (t.price > budget) return false;
@@ -513,6 +527,7 @@ function resetFilters() {
   document.getElementById('filter-country').value = '';
   document.getElementById('filter-type').value = '';
   document.getElementById('filter-nights').value = '';
+  document.getElementById('filter-season').value = '';
   document.getElementById('filter-budget').value = 6000;
   document.getElementById('budget-val').textContent = '$6 000';
   document.getElementById('search-status').textContent = '';
