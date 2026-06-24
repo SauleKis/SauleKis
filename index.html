@@ -86,6 +86,21 @@
     .tag.history   { background: #fce4ec; color: #880e4f; }
     .tag.season    { background: #f5f5f5; color: #555; font-size: 0.68rem; }
     .card-seasons  { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+
+    .people-filter { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #f7f9ff; border: 2px solid #dde3f0; border-radius: 8px; padding: 7px 12px; }
+    .people-label  { font-size: 0.83rem; color: #555; white-space: nowrap; }
+    .people-counter { display: flex; align-items: center; gap: 5px; }
+    .people-sub    { font-size: 0.75rem; color: #888; }
+    .cnt-btn {
+      width: 26px; height: 26px; border: 2px solid #dde3f0; border-radius: 6px;
+      background: white; font-size: 1rem; line-height: 1; cursor: pointer;
+      font-weight: 700; color: #1a4fa0; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .cnt-btn:hover { background: #e8f0fe; }
+    .cnt-btn:disabled { opacity: 0.3; cursor: default; }
+    #cnt-adults, #cnt-kids { font-weight: 700; font-size: 1rem; min-width: 18px; text-align: center; color: #1a4fa0; }
+    .people-total  { font-size: 0.8rem; font-weight: 700; color: #2e7d32; background: #e8f5e9; padding: 3px 9px; border-radius: 10px; }
     .card-body h3 { font-size: 0.97rem; margin-bottom: 4px; color: #1a4fa0; }
     .card-body .location { font-size: 0.8rem; color: #888; margin-bottom: 8px; }
     .card-body .desc { font-size: 0.82rem; color: #555; line-height: 1.5; margin-bottom: 12px; }
@@ -225,6 +240,24 @@
       <option value="10">10 ночей</option>
       <option value="14">14 ночей</option>
     </select>
+    <div class="people-filter">
+      <span class="people-label">👨‍👩‍👧‍👦 Туристы:</span>
+      <div class="people-counter">
+        <span>👨‍💼</span>
+        <button class="cnt-btn" onclick="changePeople('adults',-1)">−</button>
+        <span id="cnt-adults">2</span>
+        <button class="cnt-btn" onclick="changePeople('adults',1)">+</button>
+        <span class="people-sub">взр.</span>
+      </div>
+      <div class="people-counter">
+        <span>👶</span>
+        <button class="cnt-btn" onclick="changePeople('kids',-1)">−</button>
+        <span id="cnt-kids">0</span>
+        <button class="cnt-btn" onclick="changePeople('kids',1)">+</button>
+        <span class="people-sub">дет.</span>
+      </div>
+      <span class="people-total" id="people-total">2 чел.</span>
+    </div>
     <div class="budget-filter">
       <span>💰 до</span>
       <input type="range" id="filter-budget" min="500" max="6000" step="100" value="6000" oninput="updateBudget()">
@@ -342,6 +375,29 @@ function renderAll(list) {
     list.length ? list.map(renderCard).join('') :
     `<div class="no-results"><span style="font-size:3rem">🔍</span><br>Туры не найдены. Измени фильтры.</div>`;
   document.getElementById('results-count').innerHTML = `Найдено туров: <b>${list.length}</b>`;
+}
+
+// ── счётчик туристов ──
+const people = { adults: 2, kids: 0 };
+
+function changePeople(type, delta) {
+  const min = type === 'adults' ? 1 : 0;
+  const max = type === 'adults' ? 8 : 6;
+  people[type] = Math.max(min, Math.min(max, people[type] + delta));
+  document.getElementById('cnt-adults').textContent = people.adults;
+  document.getElementById('cnt-kids').textContent = people.kids;
+  const total = people.adults + people.kids;
+  document.getElementById('people-total').textContent = total + ' чел.';
+  // пересчёт цен на карточках
+  tours.forEach(t => {
+    const base = Math.round(t.price / 4 * total);
+    livePrices[t.id] = base;
+    const el = document.getElementById('price-' + t.id);
+    if (el) el.textContent = '$' + base.toLocaleString();
+    const nightEl = document.querySelector(`#tour-${t.id} .price-nights`);
+    if (nightEl) nightEl.textContent = `на ${total} чел. / ${t.nights} ночей`;
+  });
+  applyFilters();
 }
 
 // ── live обновление цен на карточках ──
@@ -527,6 +583,10 @@ function resetFilters() {
   document.getElementById('filter-country').value = '';
   document.getElementById('filter-type').value = '';
   document.getElementById('filter-nights').value = '';
+  people.adults = 2; people.kids = 0;
+  document.getElementById('cnt-adults').textContent = 2;
+  document.getElementById('cnt-kids').textContent = 0;
+  document.getElementById('people-total').textContent = '2 чел.';
   document.getElementById('filter-season').value = '';
   document.getElementById('filter-budget').value = 6000;
   document.getElementById('budget-val').textContent = '$6 000';
