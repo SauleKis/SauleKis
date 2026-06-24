@@ -97,6 +97,7 @@
     .tag.season    { background: #f5f5f5; color: #555; font-size: 0.68rem; }
     .card-seasons  { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
     .suggest-badge { font-size: 0.75rem; font-weight: 700; color: #e65100; background: #fff3e0; padding: 3px 10px; border-radius: 10px; margin-bottom: 8px; display: inline-block; }
+    .dep-badge { font-size: 0.75rem; font-weight: 600; color: #1565c0; background: #e3f2fd; padding: 2px 8px; border-radius: 10px; margin-left: 4px; }
     .suggest-banner { grid-column: 1/-1; background: #fff8e1; border: 2px dashed #ffc107; border-radius: 10px; padding: 14px 18px; font-size: 0.9rem; color: #795548; font-weight: 500; margin-bottom: 4px; }
 
     .people-filter { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #f7f9ff; border: 2px solid #dde3f0; border-radius: 8px; padding: 7px 12px; }
@@ -224,6 +225,17 @@
     <button id="search-btn" onclick="doSearch()">🔍 Найти</button>
   </div>
   <div class="filters">
+    <select id="filter-departure" onchange="applyFilters()">
+      <option value="">🛫 Город вылета</option>
+      <option value="Москва">🏙️ Москва</option>
+      <option value="Санкт-Петербург">🏙️ Санкт-Петербург</option>
+      <option value="Екатеринбург">🏙️ Екатеринбург</option>
+      <option value="Новосибирск">🏙️ Новосибирск</option>
+      <option value="Казань">🏙️ Казань</option>
+      <option value="Краснодар">🏙️ Краснодар</option>
+      <option value="Алматы">🏙️ Алматы</option>
+      <option value="Астана">🏙️ Астана</option>
+    </select>
     <select id="filter-country" onchange="applyFilters()">
       <option value="">🌍 Все страны</option>
       <option value="Турция">🇹🇷 Турция</option>
@@ -327,6 +339,22 @@
 const tagLabels = { beach:"Пляж", kids:"Дети", ai:"All Inclusive", excursion:"Экскурсии", history:"История" };
 const seasonLabels = { winter:"❄️ Зима", spring:"🌸 Весна", summer:"☀️ Лето", autumn:"🍂 Осень" };
 
+// доплата за перелёт из города (на человека, $)
+const departurePrices = {
+  "Москва": 0, "Санкт-Петербург": 40, "Екатеринбург": 80,
+  "Новосибирск": 120, "Казань": 50, "Краснодар": 30,
+  "Алматы": 100, "Астана": 110
+};
+
+// города вылета доступны для всех туров
+const departureAvailable = {
+  "Турция":  ["Москва","Санкт-Петербург","Екатеринбург","Казань","Краснодар","Алматы","Астана"],
+  "Египет":  ["Москва","Санкт-Петербург","Екатеринбург","Казань","Новосибирск"],
+  "Таиланд": ["Москва","Новосибирск","Екатеринбург","Алматы","Астана"],
+  "ОАЭ":     ["Москва","Санкт-Петербург","Алматы","Астана"],
+  "Греция":  ["Москва","Санкт-Петербург","Краснодар","Екатеринбург"],
+};
+
 const tours = [
   { id:1, name:"Selectum Family Side 5*",   country:"Турция",  resort:"Сиде",     price:3200, nights:7,  rating:4.9, tags:["beach","kids","ai"],             seasons:["spring","summer","autumn"], desc:"Новый отель с аквапарком, детским клубом и лунапарком.", emoji:"🏖️", bg:"#e0f2fe" },
   { id:2, name:"Voyage Sorgun 5*",           country:"Турция",  resort:"Сиде",     price:3750, nights:7,  rating:4.8, tags:["beach","kids","ai"],             seasons:["spring","summer","autumn"], desc:"Сосновый лес у моря, 5+ бассейнов, анимация.", emoji:"🌲", bg:"#e8f5e9" },
@@ -363,6 +391,11 @@ function renderCard(t, isSuggestion) {
   const tags = t.tags.map(tg => `<span class="tag ${tg}">${tagLabels[tg]}</span>`).join('');
   const seasons = t.seasons.map(s => `<span class="tag season">${seasonLabels[s]}</span>`).join('');
   const suggBadge = isSuggestion ? `<div class="suggest-badge">📌 Похожий вариант</div>` : '';
+  const dep = document.getElementById('filter-departure').value;
+  const depExtra = dep ? (departurePrices[dep] || 0) * (people.adults + people.kids) : 0;
+  const depBadge = dep ? `<span class="dep-badge">🛫 из ${dep}</span>` : '';
+  const total = people.adults + people.kids || 4;
+  const displayPrice = Math.round(livePrices[t.id] / 4 * total) + depExtra;
   return `
     <div class="tour-card" id="tour-${t.id}" data-price="${t.price}" data-rating="${t.rating}" data-nights="${t.nights}" data-country="${t.country}" data-tags="${t.tags.join(',')}">
       <div class="card-img" style="background:${t.bg}">${t.emoji}</div>
@@ -371,12 +404,12 @@ function renderCard(t, isSuggestion) {
         <div class="card-tags">${tags}</div>
         <div class="card-seasons">${seasons}</div>
         <h3>${t.name}</h3>
-        <div class="location">📍 ${t.resort}, ${t.country} · ${t.nights} ночей</div>
+        <div class="location">📍 ${t.resort}, ${t.country} · ${t.nights} ночей ${depBadge}</div>
         <p class="desc">${t.desc}</p>
         <div class="price-block">
           <div class="price-wrap">
-            <div class="price-live" id="price-${t.id}">$${t.price.toLocaleString()}</div>
-            <div class="price-nights">на 4 чел. / ${t.nights} ночей</div>
+            <div class="price-live" id="price-${t.id}">$${displayPrice.toLocaleString()}</div>
+            <div class="price-nights">на ${total} чел. / ${t.nights} ночей${depExtra ? ' (вкл. перелёт)' : ''}</div>
           </div>
           <div class="card-rating">★ ${t.rating}</div>
         </div>
@@ -563,6 +596,7 @@ function doSearch() {
 
 function applyFilters() {
   const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const departure = document.getElementById('filter-departure').value;
   const country = document.getElementById('filter-country').value;
   const season = document.getElementById('filter-season').value;
   const type = document.getElementById('filter-type').value;
@@ -577,6 +611,7 @@ function applyFilters() {
             !t.resort.toLowerCase().includes(q) &&
             !t.country.toLowerCase().includes(q) &&
             !t.desc.toLowerCase().includes(q)) return false;
+    if (departure && !(departureAvailable[t.country] || []).includes(departure)) return false;
     if (country && t.country !== country) return false;
     if (season && !t.seasons.includes(season)) return false;
     if (type && !t.tags.includes(type)) return false;
@@ -634,6 +669,7 @@ function resetFilters() {
   document.getElementById('cnt-adults').textContent = 2;
   document.getElementById('cnt-kids').textContent = 0;
   document.getElementById('people-total').textContent = '2 чел.';
+  document.getElementById('filter-departure').value = '';
   document.getElementById('filter-nights-min').value = '';
   document.getElementById('filter-nights-max').value = '';
   document.getElementById('filter-season').value = '';
