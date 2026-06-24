@@ -44,8 +44,15 @@
       padding: 9px 14px; border: 2px solid #dde3f0; border-radius: 8px;
       font-size: 0.88rem; background: #f7f9ff; cursor: pointer; outline: none;
     }
-    .budget-filter { display: flex; align-items: center; gap: 10px; }
-    .budget-filter span { font-size: 0.88rem; color: #444; min-width: 80px; font-weight: 600; }
+    .budget-filter { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .budget-filter span { font-size: 0.88rem; color: #444; font-weight: 500; }
+    .budget-filter input[type=number] {
+      width: 90px; padding: 8px 10px; border: 2px solid #dde3f0; border-radius: 8px;
+      font-size: 0.9rem; font-weight: 600; color: #1a4fa0; outline: none;
+      background: #f7f9ff; transition: border 0.2s;
+    }
+    .budget-filter input[type=number]:focus { border-color: #2e86de; background: white; }
+    .budget-from { display: flex; align-items: center; gap: 4px; }
     .reset-btn {
       padding: 9px 16px; background: #f0f4f8; color: #666;
       border: 2px solid #dde3f0; border-radius: 8px; font-size: 0.88rem; cursor: pointer;
@@ -259,9 +266,9 @@
       <span class="people-total" id="people-total">2 чел.</span>
     </div>
     <div class="budget-filter">
-      <span>💰 до</span>
-      <input type="range" id="filter-budget" min="500" max="6000" step="100" value="6000" oninput="updateBudget()">
-      <span id="budget-val">$6 000</span>
+      <span>💰 Бюджет:</span>
+      <span class="budget-from">от $<input type="number" id="budget-min" value="0" min="0" max="6000" step="100" oninput="updateBudget()"></span>
+      <span>до $<input type="number" id="budget-max" value="6000" min="0" max="99999" step="100" oninput="updateBudget()"></span>
     </div>
     <button class="reset-btn" onclick="resetFilters()">✕ Сбросить</button>
   </div>
@@ -536,7 +543,8 @@ function applyFilters() {
   const season = document.getElementById('filter-season').value;
   const type = document.getElementById('filter-type').value;
   const nights = document.getElementById('filter-nights').value;
-  const budget = parseInt(document.getElementById('filter-budget').value);
+  const budgetMin = parseInt(document.getElementById('budget-min').value) || 0;
+  const budgetMax = parseInt(document.getElementById('budget-max').value) || 99999;
   const sort = document.querySelector('.sort-select').value;
 
   let result = tours.filter(t => {
@@ -548,7 +556,7 @@ function applyFilters() {
     if (season && !t.seasons.includes(season)) return false;
     if (type && !t.tags.includes(type)) return false;
     if (nights && t.nights !== parseInt(nights)) return false;
-    if (t.price > budget) return false;
+    if (t.price < budgetMin || t.price > budgetMax) return false;
     return true;
   });
 
@@ -572,11 +580,7 @@ function applyFilters() {
   }
 }
 
-function updateBudget() {
-  const val = document.getElementById('filter-budget').value;
-  document.getElementById('budget-val').textContent = '$' + parseInt(val).toLocaleString();
-  applyFilters();
-}
+function updateBudget() { applyFilters(); }
 
 function resetFilters() {
   document.getElementById('search-input').value = '';
@@ -588,8 +592,8 @@ function resetFilters() {
   document.getElementById('cnt-kids').textContent = 0;
   document.getElementById('people-total').textContent = '2 чел.';
   document.getElementById('filter-season').value = '';
-  document.getElementById('filter-budget').value = 6000;
-  document.getElementById('budget-val').textContent = '$6 000';
+  document.getElementById('budget-min').value = 0;
+  document.getElementById('budget-max').value = 6000;
   document.getElementById('search-status').textContent = '';
   applyFilters();
 }
