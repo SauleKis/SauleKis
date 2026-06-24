@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Тур в Турцию — Сентябрь 2026</title>
+  <title>Поиск туров — Сентябрь 2026</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #222; }
@@ -12,217 +12,362 @@
       background: linear-gradient(135deg, #1a4fa0, #2e86de);
       color: white;
       text-align: center;
-      padding: 60px 20px 40px;
+      padding: 50px 20px 30px;
     }
-    header h1 { font-size: 2.4rem; margin-bottom: 10px; }
-    header p { font-size: 1.1rem; opacity: 0.9; }
-    .badge {
-      display: inline-block;
-      background: rgba(255,255,255,0.2);
-      border-radius: 20px;
-      padding: 6px 18px;
-      margin-top: 16px;
-      font-size: 0.95rem;
+    header h1 { font-size: 2.2rem; margin-bottom: 8px; }
+    header p { font-size: 1rem; opacity: 0.85; }
+
+    /* ── ПОИСК ── */
+    .search-bar {
+      background: white;
+      border-radius: 14px;
+      padding: 28px 28px 24px;
+      max-width: 900px;
+      margin: -28px auto 0;
+      position: relative;
+      z-index: 10;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.13);
     }
-
-    .container { max-width: 960px; margin: 0 auto; padding: 40px 20px; }
-
-    .section { background: white; border-radius: 12px; padding: 32px; margin-bottom: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
-    .section h2 { color: #1a4fa0; font-size: 1.4rem; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e8f0fe; }
-
-    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .info-item { background: #f0f6ff; border-radius: 8px; padding: 14px 18px; }
-    .info-item .label { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 0.5px; }
-    .info-item .value { font-size: 1rem; font-weight: 600; color: #1a4fa0; margin-top: 4px; }
-
-    .hotels { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-    .hotel-card { border-radius: 10px; padding: 24px; border: 2px solid; }
-    .hotel-card.gold { border-color: #f5a623; background: #fffbf0; }
-    .hotel-card.blue { border-color: #2e86de; background: #f0f6ff; }
-    .hotel-card.purple { border-color: #7b34a0; background: #f8f0ff; }
-    .hotel-card .badge-top { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; margin-bottom: 10px; }
-    .hotel-card.gold .badge-top { background: #f5a623; color: white; }
-    .hotel-card.blue .badge-top { background: #2e86de; color: white; }
-    .hotel-card.purple .badge-top { background: #7b34a0; color: white; }
-    .hotel-card h3 { font-size: 1.05rem; margin-bottom: 12px; }
-    .hotel-card ul { padding-left: 18px; font-size: 0.9rem; line-height: 1.8; color: #444; }
-    .hotel-price { font-size: 1.1rem; font-weight: 700; margin-top: 14px; color: #1a4fa0; }
-
-    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    th { background: #1a4fa0; color: white; padding: 11px 14px; text-align: left; }
-    td { padding: 10px 14px; border-bottom: 1px solid #e5e5e5; }
-    tr:nth-child(even) td { background: #f7f9fc; }
-    td:first-child { font-weight: 600; color: #333; }
-    tr:last-child td { font-weight: 700; background: #e8f5e9; color: #1b5e20; }
-
-    .checklist { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-    .check-group h3 { font-size: 1rem; color: #2e86de; margin-bottom: 12px; }
-    .check-group li { list-style: none; padding: 6px 0 6px 28px; position: relative; font-size: 0.88rem; color: #444; border-bottom: 1px solid #f0f0f0; }
-    .check-group li::before { content: '✓'; position: absolute; left: 0; color: #4caf50; font-weight: 700; }
-
-    .download-btn {
-      display: inline-block;
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .search-row input {
+      flex: 1;
+      padding: 13px 18px;
+      border: 2px solid #dde3f0;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .search-row input:focus { border-color: #2e86de; }
+    .search-row button {
+      padding: 13px 26px;
       background: #1a4fa0;
       color: white;
-      padding: 12px 28px;
+      border: none;
       border-radius: 8px;
-      text-decoration: none;
+      font-size: 1rem;
       font-weight: 600;
-      margin-top: 10px;
+      cursor: pointer;
       transition: background 0.2s;
     }
-    .download-btn:hover { background: #163d80; }
+    .search-row button:hover { background: #163d80; }
 
-    footer { text-align: center; padding: 30px 20px; color: #888; font-size: 0.85rem; }
+    .filters {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .filters select, .filters input[type=range] {
+      padding: 9px 14px;
+      border: 2px solid #dde3f0;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      background: #f7f9ff;
+      cursor: pointer;
+      outline: none;
+    }
+    .filters select:focus { border-color: #2e86de; }
+    .filter-label { font-size: 0.8rem; color: #888; display: flex; align-items: center; gap: 6px; }
+    .budget-filter { display: flex; align-items: center; gap: 10px; }
+    .budget-filter span { font-size: 0.88rem; color: #444; min-width: 80px; font-weight: 600; }
+    .reset-btn {
+      padding: 9px 16px;
+      background: #f0f4f8;
+      color: #666;
+      border: 2px solid #dde3f0;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      cursor: pointer;
+    }
+    .reset-btn:hover { background: #e0e6f0; }
+
+    /* ── КОНТЕЙНЕР ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 30px 20px 50px; }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .results-count { color: #555; font-size: 0.9rem; }
+    .sort-select {
+      padding: 7px 14px;
+      border: 2px solid #dde3f0;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      background: white;
+      cursor: pointer;
+    }
+
+    /* ── КАРТОЧКИ ТУРОВ ── */
+    #tours-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+
+    .tour-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+    .tour-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.13); }
+    .tour-card.hidden { display: none; }
+
+    .card-img {
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+    }
+    .card-body { padding: 18px; }
+    .card-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .tag {
+      font-size: 0.72rem;
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+    .tag.beach { background: #e0f2fe; color: #0277bd; }
+    .tag.kids { background: #e8f5e9; color: #2e7d32; }
+    .tag.ai { background: #fff3e0; color: #e65100; }
+    .tag.excursion { background: #f3e5f5; color: #6a1b9a; }
+    .tag.history { background: #fce4ec; color: #880e4f; }
+
+    .card-body h3 { font-size: 1rem; margin-bottom: 6px; color: #1a4fa0; }
+    .card-body .location { font-size: 0.83rem; color: #888; margin-bottom: 8px; }
+    .card-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .card-price { font-size: 1.1rem; font-weight: 700; color: #1a4fa0; }
+    .card-rating { font-size: 0.85rem; color: #f5a623; font-weight: 600; }
+    .card-nights { font-size: 0.8rem; color: #888; }
+
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #888;
+      grid-column: 1 / -1;
+    }
+    .no-results span { font-size: 3rem; display: block; margin-bottom: 14px; }
+
+    footer { text-align: center; padding: 30px 20px; color: #aaa; font-size: 0.83rem; }
 
     @media (max-width: 600px) {
-      header h1 { font-size: 1.6rem; }
-      .info-grid { grid-template-columns: 1fr; }
+      header h1 { font-size: 1.5rem; }
+      .search-row { flex-direction: column; }
+      .filters { flex-direction: column; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>✈️ Тур в Турцию</h1>
-  <p>Семейный отдых — Сентябрь 2026</p>
-  <div class="badge">👨‍👩‍👧‍👦 4 человека &nbsp;|&nbsp; 💰 до $4 000 &nbsp;|&nbsp; 🏖️ All Inclusive 5*</div>
+  <h1>✈️ Поиск туров</h1>
+  <p>Найди идеальный отдых для всей семьи</p>
 </header>
 
+<!-- ПОИСК И ФИЛЬТРЫ -->
+<div class="search-bar">
+  <div class="search-row">
+    <input type="text" id="search-input" placeholder="Поиск по названию, курорту, стране..." oninput="applyFilters()">
+    <button onclick="applyFilters()">🔍 Найти</button>
+  </div>
+  <div class="filters">
+    <select id="filter-country" onchange="applyFilters()">
+      <option value="">🌍 Все страны</option>
+      <option value="Турция">🇹🇷 Турция</option>
+      <option value="Египет">🇪🇬 Египет</option>
+      <option value="Таиланд">🇹🇭 Таиланд</option>
+      <option value="ОАЭ">🇦🇪 ОАЭ</option>
+      <option value="Греция">🇬🇷 Греция</option>
+    </select>
+
+    <select id="filter-type" onchange="applyFilters()">
+      <option value="">🏖️ Все типы</option>
+      <option value="beach">Пляжный</option>
+      <option value="kids">С детьми</option>
+      <option value="excursion">Экскурсии</option>
+      <option value="history">История</option>
+    </select>
+
+    <select id="filter-nights" onchange="applyFilters()">
+      <option value="">📅 Любой срок</option>
+      <option value="7">7 ночей</option>
+      <option value="10">10 ночей</option>
+      <option value="14">14 ночей</option>
+    </select>
+
+    <div class="budget-filter">
+      <span class="filter-label">💰 до</span>
+      <input type="range" id="filter-budget" min="500" max="6000" step="100" value="6000" oninput="updateBudget()">
+      <span id="budget-val">$6 000</span>
+    </div>
+
+    <button class="reset-btn" onclick="resetFilters()">✕ Сбросить</button>
+  </div>
+</div>
+
 <div class="container">
-
-  <!-- Описание -->
-  <div class="section">
-    <h2>📋 Описание поездки</h2>
-    <div class="info-grid">
-      <div class="info-item">
-        <div class="label">Направление</div>
-        <div class="value">Турция — Сиде / Белек</div>
-      </div>
-      <div class="info-item">
-        <div class="label">Даты</div>
-        <div class="value">10–20 сентября 2026</div>
-      </div>
-      <div class="info-item">
-        <div class="label">Состав</div>
-        <div class="value">2 взрослых + 2 детей</div>
-      </div>
-      <div class="info-item">
-        <div class="label">Формат</div>
-        <div class="value">Ultra All Inclusive 5*</div>
-      </div>
-    </div>
-    <p style="margin-top:18px; color:#555; line-height:1.7;">
-      Сентябрь — идеальный месяц для семейного отдыха: море +27–28 °C, жара спадает,
-      туристов меньше, а цены на 20–30% ниже пика сезона.
-    </p>
+  <div class="results-header">
+    <div class="results-count" id="results-count">Найдено туров: <b>9</b></div>
+    <select class="sort-select" onchange="applyFilters()">
+      <option value="price-asc">Цена: по возрастанию</option>
+      <option value="price-desc">Цена: по убыванию</option>
+      <option value="rating">По рейтингу</option>
+    </select>
   </div>
 
-  <!-- Отели -->
-  <div class="section">
-    <h2>🏨 Топ-3 рекомендованных отеля</h2>
-    <div class="hotels">
-      <div class="hotel-card gold">
-        <span class="badge-top">⭐ ВЫБОР №1</span>
-        <h3>Selectum Family Side 5*</h3>
-        <ul>
-          <li>Сиде, 1-я линия, песчаный пляж</li>
-          <li>Детский аквапарк на территории</li>
-          <li>Детский клуб + лунапарк бесплатно</li>
-          <li>Ultra All Inclusive, детское меню</li>
-        </ul>
-        <div class="hotel-price">$3 000–3 500 / 7 ночей</div>
-      </div>
-      <div class="hotel-card blue">
-        <span class="badge-top">🌊 ПРЕМИУМ</span>
-        <h3>Voyage Sorgun 5*</h3>
-        <ul>
-          <li>Сиде, сосновый лес у моря</li>
-          <li>Огромная территория, 5+ бассейнов</li>
-          <li>Активная анимация для детей</li>
-          <li>Ultra All Inclusive</li>
-        </ul>
-        <div class="hotel-price">$3 500–4 000 / 7 ночей</div>
-      </div>
-      <div class="hotel-card purple">
-        <span class="badge-top">🎡 АКТИВНОСТИ</span>
-        <h3>Selectum Family Belek 5*</h3>
-        <ul>
-          <li>Белек, рядом с The Land of Legends</li>
-          <li>Трансфер в парк включён</li>
-          <li>Аттракционы и аквапарк</li>
-          <li>All Inclusive</li>
-        </ul>
-        <div class="hotel-price">$3 800–4 500 / 7 ночей</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Бюджет -->
-  <div class="section">
-    <h2>💰 Бюджет поездки</h2>
-    <table>
-      <thead>
-        <tr><th>Статья расходов</th><th>Описание</th><th>Сумма ($)</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Перелёт</td><td>4 билета туда и обратно</td><td>$800–1 200</td></tr>
-        <tr><td>Отель (7–10 ночей)</td><td>Selectum Family Side 5*, AI</td><td>$2 500–3 200</td></tr>
-        <tr><td>Трансфер</td><td>Аэропорт–отель–аэропорт</td><td>$60–100</td></tr>
-        <tr><td>Экскурсии</td><td>2–3 экскурсии (море, водопад)</td><td>$150–250</td></tr>
-        <tr><td>Карманные расходы</td><td>Сувениры, рынок</td><td>$100–200</td></tr>
-        <tr><td>Страховка</td><td>4 чел. / 10 дней</td><td>$40–80</td></tr>
-        <tr><td>ИТОГО</td><td></td><td>$3 650–5 030</td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Чек-лист -->
-  <div class="section">
-    <h2>✅ Чек-лист подготовки</h2>
-    <div class="checklist">
-      <div class="check-group">
-        <h3>За 2–3 месяца</h3>
-        <ul>
-          <li>Оформить загранпаспорта</li>
-          <li>Забронировать тур / отель</li>
-          <li>Купить авиабилеты</li>
-          <li>Оформить страховку</li>
-        </ul>
-      </div>
-      <div class="check-group">
-        <h3>За 2–4 недели</h3>
-        <ul>
-          <li>Проверить визовые требования</li>
-          <li>Онлайн-регистрация на рейс</li>
-          <li>Уточнить трансфер</li>
-          <li>Обменять валюту</li>
-        </ul>
-      </div>
-      <div class="check-group">
-        <h3>Сборы (за 3–5 дней)</h3>
-        <ul>
-          <li>Документы: паспорта, ваучер, билеты</li>
-          <li>Одежда, купальники, обувь</li>
-          <li>Аптечка: SPF 50+, детские лекарства</li>
-          <li>Гаджеты: зарядки, power bank</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <!-- Скачать -->
-  <div class="section" style="text-align:center;">
-    <h2>📄 Скачать документ</h2>
-    <p style="color:#555; margin-bottom:16px;">Полный план тура в формате Word</p>
-    <a class="download-btn" href="Тур_Турция_Сентябрь_2026.docx" download>⬇️ Скачать .docx</a>
-  </div>
-
+  <div id="tours-list"></div>
 </div>
 
 <footer>
-  Подготовлено в июне 2026 &nbsp;•&nbsp; github.com/SauleKis/SauleKis
+  Туры актуальны на июнь 2026 &nbsp;•&nbsp; github.com/SauleKis/SauleKis
 </footer>
 
+<script>
+const tours = [
+  {
+    id: 1, name: "Selectum Family Side 5*", country: "Турция", resort: "Сиде",
+    price: 3200, nights: 7, rating: 4.9, stars: 5,
+    tags: ["beach","kids","ai"],
+    desc: "Новый семейный отель с аквапарком, детским клубом и лунапарком.",
+    emoji: "🏖️", bg: "#e0f2fe"
+  },
+  {
+    id: 2, name: "Voyage Sorgun 5*", country: "Турция", resort: "Сиде",
+    price: 3750, nights: 7, rating: 4.8, stars: 5,
+    tags: ["beach","kids","ai"],
+    desc: "Огромная территория в сосновом лесу у моря, 5+ бассейнов.",
+    emoji: "🌲", bg: "#e8f5e9"
+  },
+  {
+    id: 3, name: "Selectum Family Belek 5*", country: "Турция", resort: "Белек",
+    price: 4100, nights: 7, rating: 4.7, stars: 5,
+    tags: ["beach","kids","excursion","ai"],
+    desc: "Рядом с парком The Land of Legends. Трансфер в парк включён.",
+    emoji: "🎡", bg: "#f3e5f5"
+  },
+  {
+    id: 4, name: "Rixos Premium Belek 5*", country: "Турция", resort: "Белек",
+    price: 5500, nights: 7, rating: 5.0, stars: 5,
+    tags: ["beach","kids","ai"],
+    desc: "Флагманский курорт Rixos с частным пляжем и премиум-сервисом.",
+    emoji: "👑", bg: "#fff3e0"
+  },
+  {
+    id: 5, name: "Titanic Beach Lara 5*", country: "Турция", resort: "Анталья",
+    price: 2800, nights: 7, rating: 4.6, stars: 5,
+    tags: ["beach","kids","ai"],
+    desc: "Известный отель на пляже Лара, отличная анимация для детей.",
+    emoji: "🌅", bg: "#fce4ec"
+  },
+  {
+    id: 6, name: "Pickalbatros Aqua Park 5*", country: "Египет", resort: "Хургада",
+    price: 2200, nights: 7, rating: 4.5, stars: 5,
+    tags: ["beach","kids","ai"],
+    desc: "Огромный аквапарк на территории, прямо у Красного моря.",
+    emoji: "🐠", bg: "#e0f7fa"
+  },
+  {
+    id: 7, name: "Centara Grand 5*", country: "Таиланд", resort: "Краби",
+    price: 3900, nights: 10, rating: 4.8, stars: 5,
+    tags: ["beach","kids","excursion"],
+    desc: "Скалы, джунгли и лазурное море. Экскурсии на острова включены.",
+    emoji: "🏝️", bg: "#e8f5e9"
+  },
+  {
+    id: 8, name: "Atlantis The Palm 5*", country: "ОАЭ", resort: "Дубай",
+    price: 5800, nights: 7, rating: 4.9, stars: 5,
+    tags: ["beach","kids","excursion","ai"],
+    desc: "Легендарный отель с огромным аквапарком Aquaventure.",
+    emoji: "🌴", bg: "#fff8e1"
+  },
+  {
+    id: 9, name: "Ikos Oceania 5*", country: "Греция", resort: "Халкидики",
+    price: 4400, nights: 10, rating: 4.9, stars: 5,
+    tags: ["beach","kids","history","ai"],
+    desc: "Роскошный греческий курорт, рядом с монастырями Афона.",
+    emoji: "🏛️", bg: "#e8eaf6"
+  },
+];
+
+const tagLabels = { beach: "Пляж", kids: "Дети", ai: "All Inclusive", excursion: "Экскурсии", history: "История" };
+
+function renderCard(t) {
+  const tagHTML = t.tags.map(tag => `<span class="tag ${tag}">${tagLabels[tag]}</span>`).join('');
+  return `
+    <div class="tour-card" id="tour-${t.id}" data-price="${t.price}" data-rating="${t.rating}" data-nights="${t.nights}" data-country="${t.country}" data-tags="${t.tags.join(',')}">
+      <div class="card-img" style="background:${t.bg}">${t.emoji}</div>
+      <div class="card-body">
+        <div class="card-tags">${tagHTML}</div>
+        <h3>${t.name}</h3>
+        <div class="location">📍 ${t.resort}, ${t.country} &nbsp;·&nbsp; ${t.nights} ночей</div>
+        <p style="font-size:0.85rem;color:#555;line-height:1.5">${t.desc}</p>
+        <div class="card-meta">
+          <div>
+            <div class="card-price">$${t.price.toLocaleString()}</div>
+            <div class="card-nights">на 4 чел. / ${t.nights} ночей</div>
+          </div>
+          <div class="card-rating">★ ${t.rating}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderAll(list) {
+  document.getElementById('tours-list').innerHTML =
+    list.length
+      ? list.map(renderCard).join('')
+      : `<div class="no-results"><span>🔍</span>Туры не найдены.<br>Попробуй изменить фильтры.</div>`;
+  document.getElementById('results-count').innerHTML = `Найдено туров: <b>${list.length}</b>`;
+}
+
+function applyFilters() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  const country = document.getElementById('filter-country').value;
+  const type = document.getElementById('filter-type').value;
+  const nights = document.getElementById('filter-nights').value;
+  const budget = parseInt(document.getElementById('filter-budget').value);
+  const sort = document.querySelector('.sort-select').value;
+
+  let result = tours.filter(t => {
+    if (q && !t.name.toLowerCase().includes(q) && !t.resort.toLowerCase().includes(q) && !t.country.toLowerCase().includes(q) && !t.desc.toLowerCase().includes(q)) return false;
+    if (country && t.country !== country) return false;
+    if (type && !t.tags.includes(type)) return false;
+    if (nights && t.nights !== parseInt(nights)) return false;
+    if (t.price > budget) return false;
+    return true;
+  });
+
+  if (sort === 'price-asc') result.sort((a,b) => a.price - b.price);
+  else if (sort === 'price-desc') result.sort((a,b) => b.price - a.price);
+  else if (sort === 'rating') result.sort((a,b) => b.rating - a.rating);
+
+  renderAll(result);
+}
+
+function updateBudget() {
+  const val = document.getElementById('filter-budget').value;
+  document.getElementById('budget-val').textContent = '$' + parseInt(val).toLocaleString();
+  applyFilters();
+}
+
+function resetFilters() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('filter-country').value = '';
+  document.getElementById('filter-type').value = '';
+  document.getElementById('filter-nights').value = '';
+  document.getElementById('filter-budget').value = 6000;
+  document.getElementById('budget-val').textContent = '$6 000';
+  applyFilters();
+}
+
+// Первая отрисовка
+renderAll(tours);
+</script>
 </body>
 </html>
